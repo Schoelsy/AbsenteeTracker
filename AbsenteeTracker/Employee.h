@@ -46,12 +46,12 @@ public:
 	}
 
 	// returns amounts of sick pay days in format: pair of "Wynagrodzenie chorobowe" and "Zasi³ek chorobowy"
-	std::pair<int, int> calculateCompensation() {
+	std::pair<int, int> calculateCompensation(const Date::Date& periodStart, const Date::Date& periodEnd) {
 		constexpr int borderAge{ 50 };
 		constexpr int borderDaysForYoung{ 33 };
 		constexpr int borderDaysForOld{ 14 };
 
-		int daysOfAbsence = absenceList.daysOfAbsences();
+		int daysOfAbsence = absenceList.daysOfAbsences(periodStart, periodEnd);
 
 		if (currentAge() < borderAge || turnFiftyThisYear()) {
 			if (daysOfAbsence > borderDaysForYoung)
@@ -67,9 +67,9 @@ public:
 		}
 	}
 
-	std::string employeeFormatForReport(const char delimeter = ';') {
+	std::string employeeFormatForReport(const Date::Date& periodStart, const Date::Date& periodEnd, const char delimeter = ';') {
 		std::stringstream ss;
-		auto absenceDays = calculateCompensation();
+		auto absenceDays = calculateCompensation(periodStart, periodEnd);
 
 		ss << name << delimeter
 			<< surname << delimeter

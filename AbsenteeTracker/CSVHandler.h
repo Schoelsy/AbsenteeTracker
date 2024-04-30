@@ -91,11 +91,26 @@ public:
 		}
 	}
 
-	void saveEmployeeRecordsToFile(std::string filePath = "employeeRecords.txt") {
+	void saveEmployeeRecordsToFile(const std::string& periodStart, const std::string& periodEnd, const std::string& filePath = "employeeRecords.txt") {
 		std::ofstream outfile(filePath);
 		if (outfile.is_open()) {
-			for (auto& er : employeeRecords) {
-				outfile << er.employeeFormatForReport() << std::endl;
+			if (!periodStart.empty() && !periodEnd.empty()) {
+				for (auto& er : employeeRecords) {
+					outfile << er.employeeFormatForReport(
+						Date::convertDateStringToChronoDate(periodStart),
+						Date::convertDateStringToChronoDate(periodEnd))
+						<< std::endl;
+				}
+			}
+			else if (!periodStart.empty() && periodEnd.empty()) {
+				for (auto& er : employeeRecords) {
+					outfile << er.employeeFormatForReport(Date::convertDateStringToChronoDate(periodStart)) << std::endl;
+				}
+			}
+			else {
+				for (auto& er : employeeRecords) {
+					outfile << er.employeeFormatForReport() << std::endl;
+				}
 			}
 			outfile.close();
 		}
