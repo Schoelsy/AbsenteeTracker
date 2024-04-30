@@ -11,47 +11,15 @@ public:
 	Absence(const Date::Date& startOfAbsence, const Date::Date& endOfAbsence)
 		: startOfAbsence(startOfAbsence), endOfAbsence(endOfAbsence) {}
 
-	int daysOfAbsence(const Date::Date& periodStart, const Date::Date& periodEnd) {
+	int daysOfAbsence() {
 		int daysOfAbsence{};
 
-		if ((startOfAbsence < periodStart && endOfAbsence < periodStart) ||
-			(startOfAbsence > periodEnd)) return 0;
+		auto time1 = std::chrono::sys_days{ startOfAbsence };
+		auto time2 = std::chrono::sys_days{ endOfAbsence };
 
-		if (startOfAbsence < periodStart && endOfAbsence < periodEnd) {
-			auto time1 = std::chrono::sys_days{ periodStart };
-			auto time2 = std::chrono::sys_days{ endOfAbsence };
+		daysOfAbsence += (time2 - time1).count() + 1;
 
-			daysOfAbsence += (time2 - time1).count() + 1;
-
-			return daysOfAbsence;
-		}
-
-		if (startOfAbsence < periodStart && endOfAbsence > periodEnd) {
-			auto time1 = std::chrono::sys_days{ periodStart };
-			auto time2 = std::chrono::sys_days{ periodEnd };
-
-			daysOfAbsence += (time2 - time1).count() + 1;
-
-			return daysOfAbsence;
-		}
-
-		if (startOfAbsence > periodStart && endOfAbsence > periodEnd) {
-			auto time1 = std::chrono::sys_days{ startOfAbsence };
-			auto time2 = std::chrono::sys_days{ periodEnd };
-
-			daysOfAbsence += (time2 - time1).count() + 1;
-
-			return daysOfAbsence;
-		}
-
-		if (startOfAbsence > periodStart && endOfAbsence < periodEnd) {
-			auto time1 = std::chrono::sys_days{ startOfAbsence };
-			auto time2 = std::chrono::sys_days{ endOfAbsence };
-
-			daysOfAbsence += (time2 - time1).count() + 1;
-
-			return daysOfAbsence;
-		}
+		return daysOfAbsence;
 	}
 };
 
@@ -65,10 +33,10 @@ public:
 		absences.push_back(absence);
 	}
 
-	int daysOfAbsences(const Date::Date& periodStart, const Date::Date& periodEnd) {
+	int daysOfAbsences() {
 		int daysOfAbsences{};
 		for (auto& abs : absences) {
-			daysOfAbsences += abs.daysOfAbsence(periodStart, periodEnd);
+			daysOfAbsences += abs.daysOfAbsence();
 		}
 		return daysOfAbsences;
 	}

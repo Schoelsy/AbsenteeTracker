@@ -41,22 +41,45 @@ class CSVHandler {
 		}
 	}
 
-	void parseAbsenceFromLine(std::stringstream& ss, Absence& absence, const std::string& peselId, const char delimiter) {
+	void parseAbsenceFromLine(std::stringstream& ss, Absence& absence, const std::string& peselId, const char delimiter,
+		const std::string& periodStart, const std::string& periodEnd) {
 		std::string cell;
 		int counter{ 0u };
-		while (std::getline(ss, cell, delimiter)) {
-			switch (counter++) {
-			case 0:
-				absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
-				break;
-			case 1:
-				absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
-				break;
+		if (periodStart.empty()) {
+			while (std::getline(ss, cell, delimiter)) {
+				switch (counter++) {
+				case 0:
+					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				case 1:
+					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				}
 			}
+		}
+		else if (periodEnd.empty()) {
+			while (std::getline(ss, cell, delimiter)) {
+				switch (counter++) {
+				case 0:
+					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				case 1:
+					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				}
+			}
+			auto periodDate = Date::convertDateStringToChronoDate(periodStart);
+			if (absence.startOfAbsence < periodDate && absence.endOfAbsence > periodDate) absence.startOfAbsence = periodDate;
+			else if (absence.endOfAbsence < periodDate) absence.startOfAbsence = absence.endOfAbsence;
+		}
+		else {
+			absence.startOfAbsence = Date::convertDateStringToChronoDate(periodStart);
+			absence.endOfAbsence = Date::convertDateStringToChronoDate(periodEnd);
 		}
 	}
 
-	bool getNextEmployeeFromFile(const char delimiter) {
+	bool getNextEmployeeFromFile(const char delimiter, const std::string& periodStart,
+			const std::string& periodEnd) {
 		std::string line;
 		if (std::getline(file, line)) {
 			std::stringstream ss(line);
@@ -64,7 +87,7 @@ class CSVHandler {
 			Absence absence;
 
 			parseEmployeeFromLine(ss, employee, delimiter);
-			parseAbsenceFromLine(ss, absence, employee.peselId, delimiter);
+			parseAbsenceFromLine(ss, absence, employee.peselId, delimiter, periodStart, periodEnd);
 			auto result = std::find_if(employeeRecords.begin(), employeeRecords.end(), [&employee](const auto& e) { return employee.peselId == e.peselId; });
 			if (result != employeeRecords.end()) {
 				result->addAbsence(absence);  // jakim chujem jak tu zawolam na liscie to sie cos innego wgl dzieje, a nie jednak nie
@@ -79,9 +102,10 @@ class CSVHandler {
 	}
 
 public:
-	CSVHandler(const std::string& filePath, const char delimiter = ';') {
+	CSVHandler(const std::string& filePath, const std::string& periodStart,
+			const std::string& periodEnd, const char delimiter = ';') {
 		openFile(filePath);
-		while (getNextEmployeeFromFile(delimiter)) {}
+		while (getNextEmployeeFromFile(delimiter, periodStart, periodEnd)) {}
 	}
 
 	void openFile(const std::string& filePath) {
@@ -91,26 +115,11 @@ public:
 		}
 	}
 
-	void saveEmployeeRecordsToFile(const std::string& periodStart, const std::string& periodEnd, const std::string& filePath = "employeeRecords.txt") {
+	void saveEmployeeRecordsToFile(const std::string& filePath = "employeeRecords.txt") {
 		std::ofstream outfile(filePath);
 		if (outfile.is_open()) {
-			if (!periodStart.empty() && !periodEnd.empty()) {
-				for (auto& er : employeeRecords) {
-					outfile << er.employeeFormatForReport(
-						Date::convertDateStringToChronoDate(periodStart),
-						Date::convertDateStringToChronoDate(periodEnd))
-						<< std::endl;
-				}
-			}
-			else if (!periodStart.empty() && periodEnd.empty()) {
-				for (auto& er : employeeRecords) {
-					outfile << er.employeeFormatForReport(Date::convertDateStringToChronoDate(periodStart)) << std::endl;
-				}
-			}
-			else {
-				for (auto& er : employeeRecords) {
-					outfile << er.employeeFormatForReport() << std::endl;
-				}
+			for (auto& er : employeeRecords) {
+				outfile << er.employeeFormatForReport() << std::endl;
 			}
 			outfile.close();
 		}
