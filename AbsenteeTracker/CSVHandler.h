@@ -91,8 +91,8 @@ public:
 		}
 	}
 
-	void saveEmployeeRecordsToFile() {
-		std::ofstream outfile("employeeRecords.txt");
+	void saveEmployeeRecordsToFile(std::string filePath = "employeeRecords.txt") {
+		std::ofstream outfile(filePath);
 		if (outfile.is_open()) {
 			for (auto& er : employeeRecords) {
 				outfile << er.employeeFormatForReport() << std::endl;

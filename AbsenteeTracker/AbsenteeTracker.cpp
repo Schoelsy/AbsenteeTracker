@@ -21,24 +21,7 @@ int main(int argc, char* argv[])
 	else {
 		filePath = argv[1];
 	}
-	//auto filePath = "C:\\Users\\Scholes\\Downloads\\input.csv";
-	std::cout << "DUPA " << filePath << std::endl;
+
 	CSVHandler reader = CSVHandler(filePath);
-	auto db = reader.getEmployeeRecords();
-
-	for (auto& em : db) {
-		std::cout << "Employee: " << em.name << std::endl;
-		auto comp = em.calculateCompensation();
-		std::cout << "Compensation - Wynagrodzenie: " << comp.first << " Zasilek: " << comp.second << std::endl;
-		std::cout << "Absences: " << std::endl;
-		for (auto& abs : em.absenceList.absences) {
-			std::cout << "From: " << abs.startOfAbsence << " to: " << abs.endOfAbsence << std::endl;
-		}
-
-		std::cout << std::endl;
-	}
-
-	for (auto& em : db) {
-		std::cout << em.employeeFormatForReport() << std::endl;
-	}
+	reader.saveEmployeeRecordsToFile();
 }

@@ -22,7 +22,7 @@ class Employee {
 	bool turnFiftyThisYear() {
 		const auto currentDate = Date::get_current_date();
 		int res = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
-		std::cout << "RESULT: " << res << std::endl;
+
 		return (currentAge() == 50) && (res == 50);
 	}
 
@@ -54,14 +54,12 @@ public:
 		int daysOfAbsence = absenceList.daysOfAbsences();
 
 		if (currentAge() < borderAge || turnFiftyThisYear()) {
-			std::cout << "Dupa" << std::endl;
 			if (daysOfAbsence > borderDaysForYoung)
 				return { borderDaysForYoung,  daysOfAbsence - borderDaysForYoung };
 			else
 				return { daysOfAbsence, 0 };
 		}
 		else {
-			std::cout << "Guwno" << std::endl;
 			if (daysOfAbsence > borderDaysForOld)
 				return { borderDaysForOld,  daysOfAbsence - borderDaysForOld };
 			else
