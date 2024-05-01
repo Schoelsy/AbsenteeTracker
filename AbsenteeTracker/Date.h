@@ -18,16 +18,12 @@ namespace Date {
 			throw std::invalid_argument("Invalid date format. Expected format: dd.mm.yyyy");
 		}
 
-		// auto [day, month, year] = dateParts;  --> structure bindings
 		int day = std::stoi(dateParts[0]);
 		int month = std::stoi(dateParts[1]);
 		int year = std::stoi(dateParts[2]);
 
-		// named arguments stosowac nie wiem gdzie
-
 		return Date(std::chrono::year(year), std::chrono::month(month), std::chrono::day(day));
 	}
-
 
 	Date get_current_date() {  
 		using namespace std::chrono;

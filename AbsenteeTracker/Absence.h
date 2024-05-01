@@ -44,4 +44,12 @@ public:
 		}
 		return daysOfAbsences;
 	}
+
+	Date::Date getAbsencesDate() {
+		Date::Date date{};
+		for (auto& abs : absences) {
+			if (date < abs.endOfAbsence) date = abs.endOfAbsence;
+		}
+		return date;
+	}
 };

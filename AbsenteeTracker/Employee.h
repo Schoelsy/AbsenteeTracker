@@ -4,6 +4,7 @@
 #include "Date.h"
 #include "Absence.h"
 
+#include <iostream>
 
 class Employee {
 	int currentAge() const {
@@ -19,13 +20,32 @@ class Employee {
 		return currentAge;
 	}
 
-	// turn 50 w roku w ktorym sie sprawdza
-	// czy co jak mial w dwoch roznych latach nieobecnosci i w miedztyczasie 50
+	// Should be expanded if raport will be generated for multiple years
+	int ageInAbsencePeriod() {
+		using namespace std::chrono;
+
+		auto absenceDate = absenceList.getAbsencesDate();
+		int absenceAge = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
+
+		if (absenceDate.month() < birthday.month() || (absenceDate.month() == birthday.month() && absenceDate.day() < birthday.day())) {
+			absenceAge--;
+		}
+
+		return absenceAge;
+	}
+
 	bool turnFiftyThisYear() {
 		const auto currentDate = Date::get_current_date();
-		int res = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
+		int resultYear = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
 
-		return (currentAge() == 50) && (res == 50);
+		return (currentAge() == 50) && (resultYear == 50);
+	}
+
+	bool turnFiftyInAbsenceYear() {
+		auto absenceDate = absenceList.getAbsencesDate();
+		int resultYear = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
+
+		return (ageInAbsencePeriod() == 50) && (resultYear == 50);
 	}
 
 public:
@@ -55,7 +75,7 @@ public:
 
 		int daysOfAbsence = absenceList.daysOfAbsences();
 
-		if (currentAge() < borderAge || turnFiftyThisYear()) {
+		if (ageInAbsencePeriod() < borderAge || turnFiftyInAbsenceYear()) {
 			if (daysOfAbsence > borderDaysForYoung)
 				return { borderDaysForYoung,  daysOfAbsence - borderDaysForYoung };
 			else
