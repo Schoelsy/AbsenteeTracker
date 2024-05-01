@@ -65,8 +65,7 @@ void CSVHandler::parseAbsenceFromLine(std::stringstream& ss, Absence& absence, c
 	}
 }
 
-bool CSVHandler::getNextEmployeeFromFile(const std::string& periodStart,
-	const std::string& periodEnd) {
+bool CSVHandler::getNextEmployeeFromFile(const std::string& periodStart, const std::string& periodEnd) {
 	std::string line;
 	if (std::getline(file, line)) {
 		std::stringstream ss(line);
@@ -75,7 +74,8 @@ bool CSVHandler::getNextEmployeeFromFile(const std::string& periodStart,
 
 		parseEmployeeFromLine(ss, employee);
 		parseAbsenceFromLine(ss, absence, employee.peselId, periodStart, periodEnd);
-		auto result = std::find_if(employeeRecords.begin(), employeeRecords.end(), [&employee](const auto& e) { return employee.peselId == e.peselId; });
+		auto result = std::find_if(employeeRecords.begin(), employeeRecords.end(),
+			[&employee](const auto& e) { return employee.peselId == e.peselId; });
 		if (result != employeeRecords.end()) {
 			result->addAbsence(absence);
 		}

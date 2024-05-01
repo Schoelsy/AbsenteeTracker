@@ -1,7 +1,8 @@
 #include "pch.h"
 #include <gtest/gtest.h>
-#include "../AbsenteeTracker/Employee.h"
-#include "../AbsenteeTracker/Absence.h"
+#include "../AbsenteeTracker/Employee.cpp"
+#include "../AbsenteeTracker/Absence.cpp"
+#include "../AbsenteeTracker/Date.cpp"
 
 class EmployeeTest : public ::testing::Test {
 protected:
@@ -37,13 +38,13 @@ TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50ThisYear) {
 TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50LastYear) {
 	using namespace std::chrono;
 
-	employee.birthday = year_month_day(1973y, May, 1d);
+	employee.birthday = year_month_day(1973y, December, 1d);
 
 	auto abs1 = Absence(year_month_day(2024y, February, 1d), year_month_day(2024y, February, 10d));
 	auto abs2 = Absence(year_month_day(2023y, December, 10d), year_month_day(2023y, December, 19d));
 	employee.addAbsence(abs1);
 	employee.addAbsence(abs2);
-	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.05.1973;M;50;20;14;6");
+	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.12.1973;M;50;20;14;6");
 }
 
 // jak tu ten absence przetestowac
