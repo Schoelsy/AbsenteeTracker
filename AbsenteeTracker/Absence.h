@@ -6,12 +6,15 @@ class Absence {
 public:
 	Date::Date startOfAbsence;
 	Date::Date endOfAbsence;
+	bool outOfPeriod = false;
 
 	Absence() {}
 	Absence(const Date::Date& startOfAbsence, const Date::Date& endOfAbsence)
 		: startOfAbsence(startOfAbsence), endOfAbsence(endOfAbsence) {}
 
 	int daysOfAbsence() {
+		if (outOfPeriod) return 0;
+
 		int daysOfAbsence{};
 
 		auto time1 = std::chrono::sys_days{ startOfAbsence };

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <gtest/gtest.h>
 #include "../AbsenteeTracker/Employee.h"
+#include "../AbsenteeTracker/Absence.h"
 
 class EmployeeTest : public ::testing::Test {
 protected:
@@ -44,3 +45,5 @@ TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50LastYear) {
 	employee.addAbsence(abs2);
 	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.05.1973;M;50;20;14;6");
 }
+
+// jak tu ten absence przetestowac

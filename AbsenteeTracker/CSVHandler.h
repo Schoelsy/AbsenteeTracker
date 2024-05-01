@@ -5,6 +5,8 @@
 #include "Employee.h"
 #include "Date.h"
 
+#include <iostream>
+
 
 // Reads employee data from a CSV file and updates the database.
 // Parameters:
@@ -73,8 +75,35 @@ class CSVHandler {
 			else if (absence.endOfAbsence < periodDate) absence.startOfAbsence = absence.endOfAbsence;
 		}
 		else {
-			absence.startOfAbsence = Date::convertDateStringToChronoDate(periodStart);
-			absence.endOfAbsence = Date::convertDateStringToChronoDate(periodEnd);
+			while (std::getline(ss, cell, delimiter)) {
+				switch (counter++) {
+				case 0:
+					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				case 1:
+					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
+					break;
+				}
+			}
+
+			auto startDate = Date::convertDateStringToChronoDate(periodStart);
+			auto endDate = Date::convertDateStringToChronoDate(periodEnd);
+			std::cout << "startDate: " << startDate << " endDate: " << endDate << std::endl;
+			std::cout << "startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
+			if (absence.endOfAbsence < startDate || absence.startOfAbsence > endDate) absence.outOfPeriod = true;
+			else if (absence.startOfAbsence <= startDate && absence.endOfAbsence >= endDate) {
+				absence.startOfAbsence = startDate;
+				absence.endOfAbsence = endDate;
+				std::cout << " DUPA startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
+			} 
+			else if (absence.startOfAbsence > startDate && absence.endOfAbsence > endDate) {
+				absence.endOfAbsence = endDate;
+				std::cout << " DUPA2 startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
+			}
+			else if (absence.startOfAbsence < startDate && absence.endOfAbsence < endDate) {
+				absence.startOfAbsence = startDate;
+				std::cout << " DUPA3 startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
+			}
 		}
 	}
 
