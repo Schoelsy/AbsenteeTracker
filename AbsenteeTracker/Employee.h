@@ -19,6 +19,8 @@ class Employee {
 		return currentAge;
 	}
 
+	// turn 50 w roku w ktorym sie sprawdza
+	// czy co jak mial w dwoch roznych latach nieobecnosci i w miedztyczasie 50
 	bool turnFiftyThisYear() {
 		const auto currentDate = Date::get_current_date();
 		int res = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());

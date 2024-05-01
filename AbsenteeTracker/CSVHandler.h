@@ -17,8 +17,9 @@
 class CSVHandler {
 	std::vector<Employee> employeeRecords;
 	std::ifstream file;
+	char delimiter;
 
-	void parseEmployeeFromLine(std::stringstream& ss, Employee& employee, const char delimiter) {
+	void parseEmployeeFromLine(std::stringstream& ss, Employee& employee) {
 		std::string cell;
 		int counter{ 0u };
 		while (std::getline(ss, cell, delimiter)) {
@@ -38,76 +39,50 @@ class CSVHandler {
 			case 4:
 				employee.gender = cell[0];
 				return;
-				break;
 			}
 		}
 	}
 
-	void parseAbsenceFromLine(std::stringstream& ss, Absence& absence, const std::string& peselId, const char delimiter,
+	void parseAbsenceFromLine(std::stringstream& ss, Absence& absence, const std::string& peselId,
 		const std::string& periodStart, const std::string& periodEnd) {
 		std::string cell;
 		int counter{ 0u };
-		if (periodStart.empty()) {
-			while (std::getline(ss, cell, delimiter)) {
-				switch (counter++) {
-				case 0:
-					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				case 1:
-					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				}
+		while (std::getline(ss, cell, delimiter)) {
+			switch (counter++) {
+			case 0:
+				absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
+				break;
+			case 1:
+				absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
+				break;
 			}
 		}
+		if (periodStart.empty()) {
+			return;
+		}
 		else if (periodEnd.empty()) {
-			while (std::getline(ss, cell, delimiter)) {
-				switch (counter++) {
-				case 0:
-					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				case 1:
-					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				}
-			}
 			auto periodDate = Date::convertDateStringToChronoDate(periodStart);
 			if (absence.startOfAbsence <= periodDate && absence.endOfAbsence >= periodDate) absence.startOfAbsence = periodDate;
 			else if (absence.endOfAbsence < periodDate) absence.outOfPeriod = true;
 		}
 		else {
-			while (std::getline(ss, cell, delimiter)) {
-				switch (counter++) {
-				case 0:
-					absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				case 1:
-					absence.endOfAbsence = Date::convertDateStringToChronoDate(cell);
-					break;
-				}
-			}
-
 			auto startDate = Date::convertDateStringToChronoDate(periodStart);
 			auto endDate = Date::convertDateStringToChronoDate(periodEnd);
-			std::cout << "startDate: " << startDate << " endDate: " << endDate << std::endl;
-			std::cout << "startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
 			if (absence.endOfAbsence < startDate || absence.startOfAbsence > endDate) absence.outOfPeriod = true;
 			else if (absence.startOfAbsence <= startDate && absence.endOfAbsence >= endDate) {
 				absence.startOfAbsence = startDate;
 				absence.endOfAbsence = endDate;
-				std::cout << " DUPA startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
 			} 
 			else if (absence.startOfAbsence > startDate && absence.endOfAbsence > endDate) {
 				absence.endOfAbsence = endDate;
-				std::cout << " DUPA2 startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
 			}
 			else if (absence.startOfAbsence < startDate && absence.endOfAbsence < endDate) {
 				absence.startOfAbsence = startDate;
-				std::cout << " DUPA3 startAbsence: " << absence.startOfAbsence << " end Absence: " << absence.endOfAbsence << "\n\n";
 			}
 		}
 	}
 
-	bool getNextEmployeeFromFile(const char delimiter, const std::string& periodStart,
+	bool getNextEmployeeFromFile(const std::string& periodStart,
 			const std::string& periodEnd) {
 		std::string line;
 		if (std::getline(file, line)) {
@@ -115,15 +90,15 @@ class CSVHandler {
 			Employee employee;
 			Absence absence;
 
-			parseEmployeeFromLine(ss, employee, delimiter);
-			parseAbsenceFromLine(ss, absence, employee.peselId, delimiter, periodStart, periodEnd);
+			parseEmployeeFromLine(ss, employee);
+			parseAbsenceFromLine(ss, absence, employee.peselId, periodStart, periodEnd);
 			auto result = std::find_if(employeeRecords.begin(), employeeRecords.end(), [&employee](const auto& e) { return employee.peselId == e.peselId; });
 			if (result != employeeRecords.end()) {
-				result->addAbsence(absence);  // jakim chujem jak tu zawolam na liscie to sie cos innego wgl dzieje, a nie jednak nie
+				result->addAbsence(absence);
 			}
 			else {
 				employee.addAbsence(absence);
-				employeeRecords.push_back(employee);  // to tutaj czemu kolejnosc jest wazna
+				employeeRecords.push_back(employee);
 			}
 			return true;
 		}
@@ -134,7 +109,8 @@ public:
 	CSVHandler(const std::string& filePath, const std::string& periodStart,
 			const std::string& periodEnd, const char delimiter = ';') {
 		openFile(filePath);
-		while (getNextEmployeeFromFile(delimiter, periodStart, periodEnd)) {}
+		this->delimiter = delimiter;
+		while (getNextEmployeeFromFile(periodStart, periodEnd)) {}
 	}
 
 	void openFile(const std::string& filePath) {

@@ -20,6 +20,7 @@ public:
 		auto time1 = std::chrono::sys_days{ startOfAbsence };
 		auto time2 = std::chrono::sys_days{ endOfAbsence };
 
+		// +1 for inclusive count
 		daysOfAbsence += (time2 - time1).count() + 1;
 
 		return daysOfAbsence;
