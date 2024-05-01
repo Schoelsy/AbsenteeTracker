@@ -46,3 +46,15 @@ TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50LastYear) {
 	employee.addAbsence(abs2);
 	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.12.1973;M;50;20;14;6");
 }
+
+TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50InTheAbsenceYear) {
+	using namespace std::chrono;
+
+	employee.birthday = year_month_day(1972y, December, 1d);
+
+	auto abs1 = Absence(year_month_day(2022y, February, 1d), year_month_day(2022y, February, 10d));
+	auto abs2 = Absence(year_month_day(2022y, December, 10d), year_month_day(2022y, December, 19d));
+	employee.addAbsence(abs1);
+	employee.addAbsence(abs2);
+	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.12.1972;M;51;20;20;0");
+}
