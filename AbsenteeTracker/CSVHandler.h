@@ -71,8 +71,8 @@ class CSVHandler {
 				}
 			}
 			auto periodDate = Date::convertDateStringToChronoDate(periodStart);
-			if (absence.startOfAbsence < periodDate && absence.endOfAbsence > periodDate) absence.startOfAbsence = periodDate;
-			else if (absence.endOfAbsence < periodDate) absence.startOfAbsence = absence.endOfAbsence;
+			if (absence.startOfAbsence <= periodDate && absence.endOfAbsence >= periodDate) absence.startOfAbsence = periodDate;
+			else if (absence.endOfAbsence < periodDate) absence.outOfPeriod = true;
 		}
 		else {
 			while (std::getline(ss, cell, delimiter)) {
