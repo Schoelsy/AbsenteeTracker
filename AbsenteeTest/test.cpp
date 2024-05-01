@@ -46,5 +46,3 @@ TEST_F(EmployeeTest, ShouldProduceCorrectReport_EmployeeTurned50LastYear) {
 	employee.addAbsence(abs2);
 	EXPECT_EQ(employee.employeeFormatForReport(), "Name;Surname;123;01.12.1973;M;50;20;14;6");
 }
-
-// jak tu ten absence przetestowac
