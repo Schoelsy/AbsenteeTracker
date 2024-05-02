@@ -1,8 +1,7 @@
 #pragma once
 #include "Date.h"
 
-class Absence {
-public:
+struct Absence {
 	Date::Date startOfAbsence;
 	Date::Date endOfAbsence;
 	bool outOfPeriod = false;
@@ -13,8 +12,7 @@ public:
 	int daysOfAbsence() const;
 };
 
-class AbsenceList {
-public:
+struct AbsenceList {
 	std::vector<Absence> absences;
 
 	AbsenceList() {}

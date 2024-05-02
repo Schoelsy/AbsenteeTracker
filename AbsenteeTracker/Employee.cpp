@@ -1,45 +1,5 @@
 #include "Employee.h"
 
-int Employee::currentAge() const {
-	using namespace std::chrono;
-
-	auto currentDate = Date::get_current_date();
-	int currentAge = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
-
-	if (currentDate.month() < birthday.month() || (currentDate.month() == birthday.month() && currentDate.day() < birthday.day())) {
-		currentAge--;
-	}
-
-	return currentAge;
-}
-
-int Employee::ageInAbsencePeriod() const {
-	using namespace std::chrono;
-
-	auto absenceDate = absenceList.getAbsencesDate();
-	int absenceAge = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
-
-	if (absenceDate.month() < birthday.month() || (absenceDate.month() == birthday.month() && absenceDate.day() < birthday.day())) {
-		absenceAge--;
-	}
-
-	return absenceAge;
-}
-
-bool Employee::turnFiftyThisYear() {
-	const auto currentDate = Date::get_current_date();
-	int resultYear = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
-
-	return (currentAge() == 50) && (resultYear == 50);
-}
-
-bool Employee::turnFiftyInAbsenceYear() {
-	auto absenceDate = absenceList.getAbsencesDate();
-	int resultYear = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
-
-	return (ageInAbsencePeriod() == 50) && (resultYear == 50);
-}
-
 Employee::Employee(const std::string& name, const std::string& surname,
 	const std::string& peselId, const std::string& birthday, const std::string& gender)
 	: name(name), surname(surname), peselId(peselId), gender(gender[0]) {
@@ -86,4 +46,44 @@ std::string Employee::employeeFormatForReport(const char delimeter) {
 		<< absenceDays.second;
 
 	return ss.str();
+}
+
+int Employee::currentAge() const {
+	using namespace std::chrono;
+
+	auto currentDate = Date::get_current_date();
+	int currentAge = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
+
+	if (currentDate.month() < birthday.month() || (currentDate.month() == birthday.month() && currentDate.day() < birthday.day())) {
+		currentAge--;
+	}
+
+	return currentAge;
+}
+
+int Employee::ageInAbsencePeriod() const {
+	using namespace std::chrono;
+
+	auto absenceDate = absenceList.getAbsencesDate();
+	int absenceAge = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
+
+	if (absenceDate.month() < birthday.month() || (absenceDate.month() == birthday.month() && absenceDate.day() < birthday.day())) {
+		absenceAge--;
+	}
+
+	return absenceAge;
+}
+
+bool Employee::turnFiftyThisYear() {
+	const auto currentDate = Date::get_current_date();
+	int resultYear = static_cast<int>(currentDate.year()) - static_cast<int>(birthday.year());
+
+	return (currentAge() == 50) && (resultYear == 50);
+}
+
+bool Employee::turnFiftyInAbsenceYear() {
+	auto absenceDate = absenceList.getAbsencesDate();
+	int resultYear = static_cast<int>(absenceDate.year()) - static_cast<int>(birthday.year());
+
+	return (ageInAbsencePeriod() == 50) && (resultYear == 50);
 }

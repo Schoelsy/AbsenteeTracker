@@ -2,10 +2,38 @@
 
 #include <vector>
 
+CSVHandler::CSVHandler(const std::string& filePath, const std::string& periodStart,
+	const std::string& periodEnd, const char delimiter) {
+	openFile(filePath);
+	this->delimiter_ = delimiter;
+	while (getNextEmployeeFromFile(periodStart, periodEnd)) {}
+}
+
+void CSVHandler::openFile(const std::string& filePath) {
+	file_.open(filePath);
+	if (!file_.is_open()) {
+		throw std::runtime_error("Error opening file.");
+	}
+}
+
+void CSVHandler::saveEmployeeRecordsToFile(const std::string& filePath) {
+	std::ofstream outfile(filePath);
+	if (outfile.is_open()) {
+		for (auto& er : employeeRecords_) {
+			outfile << er.employeeFormatForReport() << std::endl;
+		}
+		outfile.close();
+	}
+}
+
+const std::vector<Employee>& CSVHandler::getEmployeeRecords() {
+	return employeeRecords_;
+}
+
 void CSVHandler::parseEmployeeFromLine(std::stringstream& ss, Employee& employee) {
 	std::string cell;
 	int counter{ 0u };
-	while (std::getline(ss, cell, delimiter)) {
+	while (std::getline(ss, cell, delimiter_)) {
 		switch (counter++) {
 		case 0:
 			employee.name = cell;
@@ -30,7 +58,7 @@ void CSVHandler::parseAbsenceFromLine(std::stringstream& ss, Absence& absence, c
 	const std::string& periodStart, const std::string& periodEnd) {
 	std::string cell;
 	int counter{ 0u };
-	while (std::getline(ss, cell, delimiter)) {
+	while (std::getline(ss, cell, delimiter_)) {
 		switch (counter++) {
 		case 0:
 			absence.startOfAbsence = Date::convertDateStringToChronoDate(cell);
@@ -67,51 +95,23 @@ void CSVHandler::parseAbsenceFromLine(std::stringstream& ss, Absence& absence, c
 
 bool CSVHandler::getNextEmployeeFromFile(const std::string& periodStart, const std::string& periodEnd) {
 	std::string line;
-	if (std::getline(file, line)) {
+	if (std::getline(file_, line)) {
 		std::stringstream ss(line);
 		Employee employee;
 		Absence absence;
 
 		parseEmployeeFromLine(ss, employee);
 		parseAbsenceFromLine(ss, absence, employee.peselId, periodStart, periodEnd);
-		auto result = std::find_if(employeeRecords.begin(), employeeRecords.end(),
+		auto result = std::find_if(employeeRecords_.begin(), employeeRecords_.end(),
 			[&employee](const auto& e) { return employee.peselId == e.peselId; });
-		if (result != employeeRecords.end()) {
+		if (result != employeeRecords_.end()) {
 			result->addAbsence(absence);
 		}
 		else {
 			employee.addAbsence(absence);
-			employeeRecords.push_back(employee);
+			employeeRecords_.push_back(employee);
 		}
 		return true;
 	}
 	return false;
-}
-
-CSVHandler::CSVHandler(const std::string& filePath, const std::string& periodStart,
-	const std::string& periodEnd, const char delimiter) {
-	openFile(filePath);
-	this->delimiter = delimiter;
-	while (getNextEmployeeFromFile(periodStart, periodEnd)) {}
-}
-
-void CSVHandler::openFile(const std::string& filePath) {
-	file.open(filePath);
-	if (!file.is_open()) {
-		throw std::runtime_error("Error opening file.");
-	}
-}
-
-void CSVHandler::saveEmployeeRecordsToFile(const std::string& filePath) {
-	std::ofstream outfile(filePath);
-	if (outfile.is_open()) {
-		for (auto& er : employeeRecords) {
-			outfile << er.employeeFormatForReport() << std::endl;
-		}
-		outfile.close();
-	}
-}
-
-const std::vector<Employee>& CSVHandler::getEmployeeRecords() {
-	return employeeRecords;
 }
